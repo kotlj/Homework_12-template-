@@ -10,7 +10,13 @@ private:
     int _curIndx;
 
 public:
-    Array(T, int size)
+    Array()
+    {
+        _size = 1;
+        _arr = new T[_size];
+        _curIndx = -1;
+    }
+    Array(int size)
     {
         _size = size;
         _arr = new T[_size];
@@ -26,7 +32,7 @@ public:
 
     int GetUpperBound()
     {
-        return this->_curIndx
+        return this->_curIndx;
     }
 
     bool IsEmpty()
@@ -36,12 +42,28 @@ public:
 
     bool IsFull()
     {
-        return (_curIndx == size - 1 ? true : false)
+        return (_curIndx == _size - 1 ? true : false);
     }
 
-    void FreeExtra();
+    void FreeExtra()
+    {
+        this->_size = this->_curIndx + 1;
+        T* temp = new T[this->_size];
+        for (int i = 0; i < this->_size; i++)
+        {
+            temp[i] = this->_arr[i];
+        }
+        delete[] this->_arr;
+        this->_arr = temp;
+        temp = nullptr;
+    }
 
-    void RemoveAll();
+    void RemoveAll()
+    {
+        delete[] this->_arr;
+        this->_arr = new T[this->_size];
+        this->_curIndx = -1;
+    }
 
     T& GetAt(int indx)
     {
@@ -101,16 +123,109 @@ void Array<T>::SetSize(int size, int grow)
 {
     if (size > _size)
     {
-
+        T* temp = new T[_size + grow];
+        for (int i = 0; i < _curIndx; i++)
+        {
+            temp[i] = this->_arr[i];
+        }
+        delete[] _arr;
+        this->_arr = temp;
+        temp = nullptr;
+        this->_size += grow;
     }
-    else if (size < _size)
+    else if (size <= _size)
     {
-
+        this->FreeExtra();
     }
 }
 
+template <typename T>
+void Array<T>::Add(T obj)
+{
+    this->_curIndx++;
+    this->_arr[_curIndx] = obj;
+}
+
+template <typename T>
+void Array<T>::Append(Array& obj)
+{
+    this->_size = this->_curIndx + obj._curIndx + 1;
+    T* temp = new T[this->_size];
+    for (int i = 0; i < this->_curIndx = 1; i++)
+    {
+        temp[i] = this->_arr[i];
+    }
+    for (int i = 0; i < obj._curIndx + 1; i++)
+    {
+        temp[i] = obj._arr[i];
+    }
+    delete[] this->_arr;
+    this->_arr = temp;
+    temp = nullptr;
+    this->_curIndx = this->_size - 1;
+}
+
+template <typename T>
+void Array<T>::InsertAt(T &obj, int indx)
+{
+    if (this->IsFull())
+    {
+        this->SetSize(this->_size + 1);
+    }
+    T* temp = new T[this->_size];
+    for (int i = 0; i < this->_size; i++)
+    {
+        if (i < indx)
+        {
+            temp[i] = this->_arr[i];
+        }
+        else if (i > indx)
+        {
+            temp[i] = this->_arr[i - 1];
+        }
+        else
+        {
+            temp[indx] = obj;
+        }
+    }
+    delete[] this->_arr;
+    this->_arr = temp;
+    temp = nullptr;
+    this->_curIndx++;
+}
+
+template <typename T>
+void Array<T>::RemoveAt(int indx)
+{
+    if (indx <= this->_curIndx)
+    {
+        T* temp = new T[this->_size];
+        for (int i = 0; i < this->_size - 1; i++)
+        {
+            if (i < indx)
+            {
+                temp[i] = this->_arr[i];
+            }
+            else
+            {
+                temp[i] = this->_arr[i + 1];
+            }
+        }
+        delete[] this->_arr;
+        this->_arr = temp;
+        temp = nullptr;
+        this->_curIndx--;
+    }
+}
 
 int main()
 {
-    
+    int size = 10;
+    Array<int> test(size);
+    for (int i = 0; i < size; i++)
+    {
+        test.InsertAt(i, i);
+    }
+    int help = test[5];
+    std::cout << help;
 }
